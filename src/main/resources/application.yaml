@@ -1,3 +1,20 @@
 spring:
   application:
-    name: demo
+    name: SibsutisGO
+
+  datasource:
+    url: jdbc:postgresql://localhost:5433/sibsutisgo
+    username: postgres
+    password: admin
+
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  docker:
+    compose:
+      enabled: false
