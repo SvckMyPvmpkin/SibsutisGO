@@ -26,8 +26,12 @@ public class Review {
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
-    public Review() {
+    public Review() {};
 
+    public Review(Trips trips, Integer rating, String description) {
+        this.trips = trips;
+        this.rating = rating;
+        this.description = description;
     }
 
     public Long getId() {
