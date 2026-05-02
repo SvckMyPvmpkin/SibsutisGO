@@ -28,6 +28,10 @@ public class SupportTicket {
 
     public SupportTicket() {}
 
+    public SupportTicket(String message){
+        this.message = message;
+    }
+
     public Long getId() {
         return id;
     }
