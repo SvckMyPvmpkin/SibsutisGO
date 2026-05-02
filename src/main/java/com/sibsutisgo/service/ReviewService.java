@@ -10,16 +10,23 @@ import java.util.Optional;
 @Service
 public class ReviewService {
     private final ReviewRepository reviewRepository;
+    //здесь подключить трипсРепозиторий
 
     public ReviewService(ReviewRepository reviewRepository){
         this.reviewRepository = reviewRepository;
     }
 
-    public Review createReview(Trips trips, Integer rating, String description){
-        //проверка на существование поездки ЧЕРЕЗ АЙДИ, но пока нет логики поездок
+    public Review createReview(Long trip_id, Integer rating, String description){
+        //добавление поездки через АЙДИ, пока нет логики поездок закомменчено
         if (rating > 5 || rating < 1) throw new IllegalArgumentException("Неверная оценка");
-        Review review = new Review(trips, rating, description);
-        return reviewRepository.save(review);
+        //Optional<Review> trip = tripRepository.findById(trip_id);
+        //if(trip.isPresent){
+        //    Trips foundTrip = trip.get();
+        //    Review review = new Review(foundTrip.id, rating, description);
+        //    return reviewRepository.createReview(review);
+        //} else {
+        //    throw new IllegalArgumentException("Нет поездки");
+        // }
     }
 
     public Optional<Review> getReviewByTripId(Long tripId){
