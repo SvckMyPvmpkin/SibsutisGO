@@ -23,7 +23,7 @@ public class ReviewService {
         //if(trip.isPresent){
         //    Trips foundTrip = trip.get();
         //    Review review = new Review(foundTrip.id, rating, description);
-        //    return reviewRepository.createReview(review);
+        //    return reviewRepository.save(review);
         //} else {
         //    throw new IllegalArgumentException("Нет поездки");
         // }
