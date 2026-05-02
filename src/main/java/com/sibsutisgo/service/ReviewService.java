@@ -29,6 +29,10 @@ public class ReviewService {
         // }
     }
 
+    public void deleteReview(Long id){
+        reviewRepository.deleteById(id);
+    }
+
     public Optional<Review> getReviewByTripId(Long tripId){
         return reviewRepository.findByTrips_Id(tripId);
     }
