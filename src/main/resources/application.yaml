@@ -18,3 +18,11 @@ spring:
   docker:
     compose:
       enabled: false
+
+application:
+  security:
+    jwt:
+      secret-key: "SANCHEZKSESHHHHiiiiiSTEPAAANIDZELONGENOUGHKEY12345"
+      expiration: 86400000
+      refresh-token:
+        expiration: 604800000

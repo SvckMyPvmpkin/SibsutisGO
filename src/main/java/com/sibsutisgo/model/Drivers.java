@@ -3,6 +3,7 @@ package com.sibsutisgo.model;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -33,7 +34,7 @@ public class Drivers {
 
     @CreationTimestamp
     @Column(name = "createdAt", nullable = false,  updatable = false)
-    private Date createdAt;
+    private LocalDateTime createdAt;
 
     public Drivers(){
     }
@@ -70,14 +71,6 @@ public class Drivers {
         this.phone = phone;
     }
 
-    public String getLicense_number() {
-        return license_number;
-    }
-
-    public void setLicense_number(String license_number) {
-        this.license_number = license_number;
-    }
-
     public boolean isStatus() {
         return status;
     }
@@ -86,11 +79,19 @@ public class Drivers {
         this.status = status;
     }
 
-    public Date getCreatedAt() {
+    public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Date createdAt) {
+    public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public String getLicenseNumber() {
+        return license_number;
+    }
+
+    public void setLicenseNumber(String s) {
+        this.license_number = s;
     }
 }
