@@ -43,6 +43,7 @@ public class Trips {
     public Trips() {
 
     }
+
     public Long getId() {
         return id;
     }
@@ -90,5 +91,17 @@ public class Trips {
     }
     public void setPrice(BigDecimal price) {
         this.price = price;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 }
