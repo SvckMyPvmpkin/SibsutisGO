@@ -1,5 +1,6 @@
 package com.sibsutisgo.service;
 
+import com.sibsutisgo.dto.SupportTicketByStatusDTO;
 import com.sibsutisgo.model.SupportStatus;
 import com.sibsutisgo.model.SupportTicket;
 import com.sibsutisgo.repository.SupportRepository;
@@ -7,8 +8,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class SupportService {
@@ -37,8 +37,20 @@ public class SupportService {
         return supportRepository.save(foundTicket);
     }
 
-    public List<SupportTicket> getTicketsByStatus(SupportStatus status){
-        return supportRepository.findByStatus(status);
+    private SupportTicketByStatusDTO getTicketsByStatuses(List<SupportStatus> statuses) {
+        Map<SupportStatus, List<SupportTicket>> map = new EnumMap<>(SupportStatus.class);
+        for (SupportStatus status : statuses) {
+            map.put(status, supportRepository.findByStatus(status));
+        }
+        return new SupportTicketByStatusDTO(map);
+    }
+
+    public SupportTicketByStatusDTO getActiveTickets() {
+        return getTicketsByStatuses(List.of(SupportStatus.OPEN, SupportStatus.IN_PROGRESS));
+    }
+
+    public SupportTicketByStatusDTO getClosedTickets() {
+        return getTicketsByStatuses(List.of(SupportStatus.CLOSED));
     }
 
     public Optional<SupportTicket> getTicketById(Long id){
