@@ -1,11 +1,11 @@
 package com.sibsutisgo.controller;
 
-import com.sibsutisgo.dto.LoginRequest;
-import com.sibsutisgo.model.*;
+import com.sibsutisgo.dto.*;
+import com.sibsutisgo.model.Passengers;
 import com.sibsutisgo.service.UserService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -16,19 +16,19 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping("/auth/login")
-    public ResponseEntity<Map<String, String>> login(@RequestBody LoginRequest req) {
-        return ResponseEntity.ok(Map.of("accessToken", userService.login(req.email())));
-    }
-
     @PostMapping("/passengers")
-    public ResponseEntity<Map<String, String>> regPassenger(@RequestBody Passengers p) {
-        return ResponseEntity.ok(Map.of("accessToken", userService.registerPassenger(p)));
+    public ResponseEntity<PassengerResponse> regPassenger(@RequestBody PassengerRegistrationRequest regRequest) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(userService.registerPassenger(regRequest));
     }
 
     @PostMapping("/drivers")
-    public ResponseEntity<Map<String, String>> regDriver(@RequestBody Drivers d) {
-        return ResponseEntity.ok(Map.of("accessToken", userService.registerDriver(d)));
+    public ResponseEntity<DriverResponse> regDriver(@RequestBody DriverRegistrationRequest regRequest) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(userService.registerDriver(regRequest));
+    }
+
+    @PostMapping("/auth/login")
+    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest loginRequest) {
+        return ResponseEntity.ok(userService.login(loginRequest.email()));
     }
 
     @GetMapping("/passengers/{id}")
@@ -37,13 +37,16 @@ public class UserController {
     }
 
     @GetMapping("/drivers/{id}")
-    public ResponseEntity<Drivers> getD(@PathVariable Long id) {
-        return ResponseEntity.ok(userService.getDriver(id));
+    public ResponseEntity<DriverResponse> getDriver(@PathVariable Long id) {
+        return ResponseEntity.ok(userService.getDriverById(id));
     }
 
     @PatchMapping("/drivers/{id}/status")
-    public ResponseEntity<Void> updateStatus(@PathVariable Long id, @RequestBody Map<String, Boolean> req) {
-        userService.updateDriverStatus(id, req.get("status"));
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Void> updateStatus(
+            @PathVariable Long id,
+            @RequestBody DriverStatusRequest request) {
+
+        userService.updateDriverStatus(id, request.newStatus());
+        return ResponseEntity.noContent().build();
     }
 }

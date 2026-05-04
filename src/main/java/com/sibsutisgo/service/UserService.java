@@ -1,9 +1,11 @@
 package com.sibsutisgo.service;
 
+import com.sibsutisgo.dto.*;
 import com.sibsutisgo.model.*;
 import com.sibsutisgo.repository.*;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 
 @Service
 public class UserService {
@@ -20,25 +22,80 @@ public class UserService {
             this.jwtService = jwtService;
         }
 
-    public String registerPassenger(Passengers p) {
-        if (passengerRepository.findByEmail(p.getEmail()).isPresent()) {
-            throw new RuntimeException("User with this email already exists!");
+    public PassengerResponse registerPassenger(PassengerRegistrationRequest dto) {
+        if (passengerRepository.findByEmail(dto.email()).isPresent()) {
+            throw new RuntimeException("User with this email already exists");
         }
-        passengerRepository.save(p);
-        return jwtService.generateToken(p.getEmail());
+
+        Passengers passenger = new Passengers();
+        passenger.setName(dto.name());
+        passenger.setEmail(dto.email());
+        passenger.setPhone(dto.phone());
+        passenger.setCreatedAt(LocalDateTime.now());
+
+        Passengers savedPassenger = passengerRepository.save(passenger);
+
+        return new PassengerResponse(
+                savedPassenger.getId(),
+                savedPassenger.getName(),
+                savedPassenger.getEmail(),
+                savedPassenger.getPhone(),
+                savedPassenger.getCreatedAt()
+        );
     }
 
-    public String registerDriver(Drivers d) {
-        d.setStatus(true);
-        driverRepository.save(d);
-        return jwtService.generateToken(d.getEmail());
+    public AuthResponse login(String email) {
+        String userEmail = passengerRepository.findByEmail(email)
+                .map(Passengers::getEmail)
+                .orElseGet(() -> driverRepository.findByEmail(email)
+                        .map(Drivers::getEmail)
+                        .orElseThrow(() -> new RuntimeException("User not found with email: " + email))
+                );
+
+        String token = jwtService.generateToken(userEmail);
+
+        return new AuthResponse(token);
     }
 
-    public String login(String email) {
-        boolean exists = passengerRepository.findByEmail(email).isPresent() ||
-                driverRepository.findByEmail(email).isPresent();
-        if (!exists) throw new RuntimeException("User not found");
-        return jwtService.generateToken(email);
+    public DriverResponse registerDriver(DriverRegistrationRequest dto) {
+        if (driverRepository.findByEmail(dto.email()).isPresent()) {
+            throw new RuntimeException("Driver with this email already exists");
+        }
+
+        Drivers driver = new Drivers();
+        driver.setName(dto.name());
+        driver.setEmail(dto.email());
+        driver.setPhone(dto.phone());
+        driver.setLicenseNumber(dto.licenseNumber());
+        driver.setStatus(true);
+        driver.setCreatedAt(LocalDateTime.now());
+
+        Drivers saved = driverRepository.save(driver);
+
+        return new DriverResponse(
+                saved.getId(),
+                saved.getName(),
+                saved.getEmail(),
+                saved.getPhone(),
+                saved.getLicenseNumber(),
+                saved.isStatus(),
+                saved.getCreatedAt()
+        );
+    }
+
+    public DriverResponse getDriverById(Long id) {
+        Drivers driver = driverRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Driver not found"));
+
+        return new DriverResponse(
+                driver.getId(),
+                driver.getName(),
+                driver.getEmail(),
+                driver.getPhone(),
+                driver.getLicenseNumber(),
+                driver.isStatus(),
+                driver.getCreatedAt()
+        );
     }
 
     public Passengers getPassenger(Long id) {
@@ -49,9 +106,11 @@ public class UserService {
         return driverRepository.findById(id).orElseThrow();
     }
 
-    @Transactional
-    public void updateDriverStatus(Long id, boolean status) {
-        Drivers driver = driverRepository.findById(id).orElseThrow();
-        driver.setStatus(status);
+    public void updateDriverStatus(Long id, boolean newStatus) {
+        Drivers driver = driverRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Driver not found with id: " + id));
+
+        driver.setStatus(newStatus);
+        driverRepository.save(driver);
     }
 }
