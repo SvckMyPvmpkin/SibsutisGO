@@ -3,6 +3,7 @@ package com.sibsutisgo.service;
 import com.sibsutisgo.model.Review;
 import com.sibsutisgo.model.Trips;
 import com.sibsutisgo.repository.ReviewRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -10,23 +11,15 @@ import java.util.Optional;
 @Service
 public class ReviewService {
     private final ReviewRepository reviewRepository;
-    //здесь подключить трипсРепозиторий
 
     public ReviewService(ReviewRepository reviewRepository){
         this.reviewRepository = reviewRepository;
     }
 
-    public Review createReview(Long trip_id, Integer rating, String description){
-        //добавление поездки через АЙДИ, пока нет логики поездок закомменчено
+    public Review createReview(Long tripId, Integer rating, String description){
         if (rating > 5 || rating < 1) throw new IllegalArgumentException("Неверная оценка");
-        //Optional<Review> trip = tripRepository.findById(trip_id);
-        //if(trip.isPresent){
-        //    Trips foundTrip = trip.get();
-        //    Review review = new Review(foundTrip.id, rating, description);
-        //    return reviewRepository.save(review);
-        //} else {
-        //    throw new IllegalArgumentException("Нет поездки");
-        // }
+        Review savedReview = new Review(tripId, rating, description);
+        return reviewRepository.save(savedReview);
     }
 
     public void deleteReview(Long id){
@@ -34,7 +27,7 @@ public class ReviewService {
     }
 
     public Optional<Review> getReviewByTripId(Long tripId){
-        return reviewRepository.findByTrips_Id(tripId);
+        return reviewRepository.findByTripId(tripId);
     }
 
     public Optional<Review> getReviewById(Long id){
