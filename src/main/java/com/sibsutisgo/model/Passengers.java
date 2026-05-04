@@ -3,6 +3,7 @@ package com.sibsutisgo.model;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -24,7 +25,7 @@ public class Passengers {
 
     @CreationTimestamp
     @Column(name = "createdAt", nullable = false,  updatable = false)
-    private Date createdAt;
+    private LocalDateTime createdAt;
 
     public Passengers(){
     }
@@ -61,11 +62,11 @@ public class Passengers {
         this.phone = phone;
     }
 
-    public Date getCreatedAt() {
+    public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Date createdAt) {
+    public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
 }
