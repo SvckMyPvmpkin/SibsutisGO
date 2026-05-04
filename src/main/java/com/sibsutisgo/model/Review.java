@@ -12,9 +12,8 @@ public class Review {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "trip_id", nullable = false)
-    private Trips trips;
+    @Column(name = "trip_id")
+    private Long tripId;
 
     @Column(nullable = false)
     private Integer rating;
@@ -34,12 +33,12 @@ public class Review {
         return id;
     }
 
-    public Trips getTrip() {
-        return trips;
+    public Long getTripId() {
+        return tripId;
     }
 
-    public void setTrip(Trips trip) {
-        this.trips = trip;
+    public void setTripId(Long tripId) {
+        this.tripId = tripId;
     }
 
     public Integer getRating() {

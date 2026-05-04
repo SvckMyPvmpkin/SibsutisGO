@@ -15,9 +15,8 @@ public class NotificationTasks {
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         private Long id;
 
-        @ManyToOne(fetch = FetchType.LAZY)
-        @JoinColumn(name = "trip_id", nullable = false)
-        private Trips trips;
+        @Column(name = "trip_id")
+        private Long tripId;
 
         @Enumerated(EnumType.STRING)
         @Column(nullable = false)
@@ -46,11 +45,12 @@ public class NotificationTasks {
             return id;
         }
 
-        public Trips getTrip() {
-            return trips;
+        public Long getTripId() {
+            return tripId;
         }
-        public void setTrip(Trips trip) {
-            this.trips = trip;
+
+        public void setTripId(Long tripId) {
+            this.tripId = tripId;
         }
 
         public RecipientType getRecipientType() {

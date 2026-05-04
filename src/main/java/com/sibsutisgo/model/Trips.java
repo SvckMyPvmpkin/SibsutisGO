@@ -13,13 +13,11 @@ public class Trips {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "passenger_id", nullable = false)
-    private Passengers passenger;
+    @Column(name = "passenger_id")
+    private Long passengerId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "driver_id", nullable = true)
-    private Drivers driver;
+    @Column(name = "driver_id")
+    private Long driverId;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -49,18 +47,20 @@ public class Trips {
         return id;
     }
 
-    public Passengers getPassenger() {
-        return passenger;
-    }
-    public void setPassenger(Passengers passenger) {
-        this.passenger = passenger;
+    public Long getPassengerId() {
+        return passengerId;
     }
 
-    public Drivers getDriver() {
-        return driver;
+    public void setPassengerId(Long passengerId) {
+        this.passengerId = passengerId;
     }
-    public void setDriver(Drivers driver) {
-        this.driver = driver;
+
+    public Long getDriverId() {
+        return driverId;
+    }
+
+    public void setDriverId(Long driverId) {
+        this.driverId = driverId;
     }
 
     public TripsStatus getStatus() {
