@@ -41,12 +41,16 @@ public class TripService {
         return mapToResponse(saved);
     }
 
-    public Optional<Trips> getTripById(Long id) {
-        return tripRepository.findById(id);
+    public Optional<TripResponse> getTripById(Long id) {
+        return tripRepository.findById(id)
+                .map(this::mapToResponse);
     }
 
-    public List<Trips> getTripsByPassengerId(Long passengerId) {
-        return tripRepository.findByPassengerId(passengerId);
+    public List<TripResponse> getTripsByPassengerId(Long passengerId) {
+        return tripRepository.findByPassengerId(passengerId)
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
     }
 
     @Transactional
