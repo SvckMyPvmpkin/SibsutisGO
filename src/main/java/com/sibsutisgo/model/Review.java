@@ -12,7 +12,8 @@ public class Review {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "trip_id")
+//    @OneToOne(fetch = FetchType.LAZY)
+    @Column(name = "trip_id", nullable = false)
     private Long tripId;
 
     @Column(nullable = false)
@@ -25,8 +26,12 @@ public class Review {
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
-    public Review() {
+    public Review() {};
 
+    public Review(Long tripId, Integer rating, String description) {
+        this.tripId = tripId;
+        this.rating = rating;
+        this.description = description;
     }
 
     public Long getId() {
