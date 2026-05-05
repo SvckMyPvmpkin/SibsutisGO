@@ -1,10 +1,9 @@
 package com.sibsutisgo.controller;
 
-import com.sibsutisgo.dto.ReviewRequestDTO;
+import com.sibsutisgo.dto.ReviewRequest;
+import com.sibsutisgo.dto.ReviewResponse;
 import com.sibsutisgo.model.Review;
-import com.sibsutisgo.model.Trips;
 import com.sibsutisgo.service.ReviewService;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,13 +18,13 @@ public class ReviewController {
     }
 
     @PostMapping
-    public ResponseEntity<Review> createReview(@RequestBody ReviewRequestDTO reviewRequest){
-        Review savedReview = reviewService.createReview(reviewRequest.getId(), reviewRequest.getRating(), reviewRequest.getDescription());
+    public ResponseEntity<ReviewResponse> createReview(@RequestBody ReviewRequest reviewRequest){
+        ReviewResponse savedReview = reviewService.createReview(reviewRequest.id(), reviewRequest.rating(), reviewRequest.description());
         return new ResponseEntity<>(savedReview, HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Review> getReviewByID(@PathVariable Long id){
+    public ResponseEntity<ReviewResponse> getReviewByID(@PathVariable Long id){
         return reviewService.getReviewById(id)
                 .map(review -> new ResponseEntity<>(review, HttpStatus.OK))
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
@@ -38,7 +37,7 @@ public class ReviewController {
     }
 
     @GetMapping("/trip/{id}")
-    public ResponseEntity<Review> getReviewByTripId(@PathVariable Long trip_id){
+    public ResponseEntity<ReviewResponse> getReviewByTripId(@PathVariable Long trip_id){
         return reviewService.getReviewByTripId(trip_id)
                 .map(review -> new ResponseEntity<>(review, HttpStatus.OK))
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
