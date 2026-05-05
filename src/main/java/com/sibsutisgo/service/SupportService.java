@@ -1,6 +1,7 @@
 package com.sibsutisgo.service;
 
-import com.sibsutisgo.dto.SupportTicketByStatusDTO;
+import com.sibsutisgo.dto.SupportTicketByStatusResponse;
+import com.sibsutisgo.dto.SupportTicketResponse;
 import com.sibsutisgo.model.SupportStatus;
 import com.sibsutisgo.model.SupportTicket;
 import com.sibsutisgo.repository.SupportRepository;
@@ -18,42 +19,51 @@ public class SupportService {
         this.supportRepository = supportRepository;
     }
 
-    public SupportTicket createTicket(String message){
-        SupportTicket ticket = new SupportTicket(message);
-        return supportRepository.save(ticket);
+    public SupportTicketResponse createTicket(String message){
+        SupportTicket ticket = new SupportTicket();
+        ticket.setMessage(message);
+        ticket.setStatus(SupportStatus.OPEN);
+        SupportTicket savedTicket = supportRepository.save(ticket);
+        return mapToResponse(savedTicket);
     }
 
-    public SupportTicket closeTicket(Long ticketId){
+    public SupportTicketResponse changeStatusTicket(Long ticketId, SupportStatus status){
         SupportTicket foundTicket = supportRepository.findById(ticketId)
                 .orElseThrow(() -> new EntityNotFoundException("Нет такого тикета"));
 
-        if (foundTicket.getStatus() == SupportStatus.CLOSED) {
-            return foundTicket;
+        if (foundTicket.getStatus() == status) {
+            return mapToResponse(foundTicket);
         }
 
-        foundTicket.setStatus(SupportStatus.CLOSED);
-        foundTicket.setClosedAt(LocalDateTime.now());
+        foundTicket.setStatus(status);
+        if(status == SupportStatus.CLOSED ) foundTicket.setClosedAt(LocalDateTime.now());
 
-        return supportRepository.save(foundTicket);
+        SupportTicket savedTicket = supportRepository.save(foundTicket);
+        return mapToResponse(savedTicket);
     }
 
-    private SupportTicketByStatusDTO getTicketsByStatuses(List<SupportStatus> statuses) {
+    private SupportTicketByStatusResponse getTicketsByStatuses(List<SupportStatus> statuses) {
         Map<SupportStatus, List<SupportTicket>> map = new EnumMap<>(SupportStatus.class);
         for (SupportStatus status : statuses) {
             map.put(status, supportRepository.findByStatus(status));
         }
-        return new SupportTicketByStatusDTO(map);
+        return new SupportTicketByStatusResponse(map);
     }
 
-    public SupportTicketByStatusDTO getActiveTickets() {
+    public SupportTicketByStatusResponse getActiveTickets() {
         return getTicketsByStatuses(List.of(SupportStatus.OPEN, SupportStatus.IN_PROGRESS));
     }
 
-    public SupportTicketByStatusDTO getClosedTickets() {
+    public SupportTicketByStatusResponse getClosedTickets() {
         return getTicketsByStatuses(List.of(SupportStatus.CLOSED));
     }
 
-    public Optional<SupportTicket> getTicketById(Long id){
-        return supportRepository.findById(id);
+    public Optional<SupportTicketResponse> getTicketById(Long id){
+        return supportRepository.findById(id).map(this::mapToResponse);
+    }
+
+    public SupportTicketResponse mapToResponse(SupportTicket ticket){
+        return new SupportTicketResponse(ticket.getId(), ticket.getMessage(),
+                ticket.getStatus(), ticket.getCreatedAt(), ticket.getClosedAt());
     }
 }
