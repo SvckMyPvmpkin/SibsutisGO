@@ -19,7 +19,7 @@ public class ReviewController {
 
     @PostMapping
     public ResponseEntity<ReviewResponse> createReview(@RequestBody ReviewRequest reviewRequest){
-        ReviewResponse savedReview = reviewService.createReview(reviewRequest.id(), reviewRequest.rating(), reviewRequest.description());
+        ReviewResponse savedReview = reviewService.createReview(reviewRequest.tripId(), reviewRequest.rating(), reviewRequest.description());
         return new ResponseEntity<>(savedReview, HttpStatus.CREATED);
     }
 
@@ -36,9 +36,9 @@ public class ReviewController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @GetMapping("/trip/{id}")
-    public ResponseEntity<ReviewResponse> getReviewByTripId(@PathVariable Long trip_id){
-        return reviewService.getReviewByTripId(trip_id)
+    @GetMapping("/{tripId}/trip")
+    public ResponseEntity<ReviewResponse> getReviewByTripId(@PathVariable Long tripId){
+        return reviewService.getReviewByTripId(tripId)
                 .map(review -> new ResponseEntity<>(review, HttpStatus.OK))
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }

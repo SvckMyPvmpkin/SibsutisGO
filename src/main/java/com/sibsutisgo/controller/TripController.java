@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/trips")
+@RequestMapping("/api/trips")
 public class TripController {
     private final TripService tripService;
 
@@ -40,7 +40,6 @@ public class TripController {
         return ResponseEntity.ok(history);
     }
 
-    // 4. Обновление статуса: PATCH /trips/{id}/status
     @PatchMapping("/{id}/status")
     public ResponseEntity<TripResponse> updateStatus(
             @PathVariable Long id,

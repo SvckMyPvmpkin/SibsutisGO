@@ -1,7 +1,7 @@
 package com.sibsutisgo.dto;
 
 public record ReviewRequest(
-        Long id,
+        Long tripId,
         Integer rating,
         String description
 ) { }
