@@ -28,12 +28,6 @@ public class Review {
 
     public Review() {};
 
-    public Review(Long tripId, Integer rating, String description) {
-        this.tripId = tripId;
-        this.rating = rating;
-        this.description = description;
-    }
-
     public Long getId() {
         return id;
     }
