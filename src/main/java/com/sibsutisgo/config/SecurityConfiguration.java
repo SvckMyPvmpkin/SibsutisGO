@@ -18,7 +18,7 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         // Пока что все запросы без защиты (токен есть)
-                        .requestMatchers("/api/v1/**").permitAll()
+                        .requestMatchers("/api/v1/**", "/api/trips/**", "/api/support/**", "/api/reviews/**").permitAll()
                         .anyRequest().authenticated()
                 );
 

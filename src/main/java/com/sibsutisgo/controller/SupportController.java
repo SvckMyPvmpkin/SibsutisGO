@@ -1,7 +1,10 @@
 package com.sibsutisgo.controller;
 
-import com.sibsutisgo.dto.SupportTicketByStatusDTO;
-import com.sibsutisgo.dto.SupportTicketCreateDTO;
+import com.sibsutisgo.dto.SupportTicketByStatusResponse;
+import com.sibsutisgo.dto.SupportTicketCreateRequest;
+import com.sibsutisgo.dto.SupportTicketResponse;
+import com.sibsutisgo.dto.SupportTicketStatusChangeRequest;
+import com.sibsutisgo.model.SupportStatus;
 import com.sibsutisgo.model.SupportTicket;
 import com.sibsutisgo.service.SupportService;
 import org.springframework.http.HttpStatus;
@@ -18,30 +21,30 @@ public class SupportController {
     }
 
     @PostMapping
-    public ResponseEntity<SupportTicket> createTicket(@RequestBody SupportTicketCreateDTO request){
-        SupportTicket savedTicket = supportService.createTicket(request.getMessage());
+    public ResponseEntity<SupportTicketResponse> createTicket(@RequestBody SupportTicketCreateRequest request){
+        SupportTicketResponse savedTicket = supportService.createTicket(request.message());
         return new ResponseEntity<>(savedTicket, HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<SupportTicket> getTicketByID(@PathVariable Long id){
+    public ResponseEntity<SupportTicketResponse> getTicketByID(@PathVariable Long id){
         return supportService.getTicketById(id)
                 .map(ticket -> new ResponseEntity<>(ticket, HttpStatus.OK))
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @GetMapping("/active")
-    public ResponseEntity<SupportTicketByStatusDTO> getTicketByActiveStatus(){
+    public ResponseEntity<SupportTicketByStatusResponse> getTicketByActiveStatus(){
         return new ResponseEntity<>(supportService.getActiveTickets(), HttpStatus.OK);
     }
 
     @GetMapping("/closed")
-    public ResponseEntity<SupportTicketByStatusDTO> getTicketByClosedStatus(){
+    public ResponseEntity<SupportTicketByStatusResponse> getTicketByClosedStatus(){
         return new ResponseEntity<>(supportService.getClosedTickets(), HttpStatus.OK);
     }
 
-    @PatchMapping("/{id}")
-    public ResponseEntity<SupportTicket> patchTicket(@PathVariable Long id){
-        return new ResponseEntity<>(supportService.closeTicket(id), HttpStatus.OK);
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<SupportTicketResponse> patchTicket(@PathVariable Long id, @RequestBody SupportTicketStatusChangeRequest request) {
+        return new ResponseEntity<>(supportService.changeStatusTicket(id, request.status()), HttpStatus.OK);
     }
 }
