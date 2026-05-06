@@ -19,6 +19,21 @@ spring:
     compose:
       enabled: false
 
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+    listener:
+      simple:
+        retry:
+          enabled: true
+          initial-interval: 3s
+          max-attempts: 3
+        concurrency: 1
+        max-concurrency: 5
+
 application:
   security:
     jwt:
