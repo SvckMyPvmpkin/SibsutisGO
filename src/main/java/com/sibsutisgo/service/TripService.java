@@ -3,12 +3,14 @@ package com.sibsutisgo.service;
 
 import com.sibsutisgo.dto.TripCreateRequest;
 import com.sibsutisgo.dto.TripResponse;
+import com.sibsutisgo.dto.messaging.DriverStatusUpdateEvent;
 import com.sibsutisgo.model.Trips;
 import com.sibsutisgo.model.TripsStatus;
 import com.sibsutisgo.repository.TripRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.TransactionRolledbackException;
 import jakarta.transaction.Transactional;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -19,9 +21,11 @@ import java.util.Optional;
 @Service
 public class TripService {
     private final TripRepository tripRepository;
+    private final RabbitTemplate rabbitTemplate;
 
-    public TripService(TripRepository tripRepository) {
+    public TripService(TripRepository tripRepository, RabbitTemplate rabbitTemplate) {
         this.tripRepository = tripRepository;
+        this.rabbitTemplate = rabbitTemplate;
     }
 
     public TripResponse createTrip(TripCreateRequest request) {
@@ -69,6 +73,11 @@ public class TripService {
         trip.setStatus(newStatus);
 
         Trips savedTrip = tripRepository.save(trip);
+
+        if(newStatus == TripsStatus.CANCELLED || newStatus == TripsStatus.COMPLETED){
+            DriverStatusUpdateEvent event = new DriverStatusUpdateEvent(trip.getDriverId(), true);
+            rabbitTemplate.convertAndSend("driver-status-queue", event);
+        }
 
         return new TripResponse(savedTrip.getId(),
                 savedTrip.getPassengerId(), savedTrip.getDriverId(),
