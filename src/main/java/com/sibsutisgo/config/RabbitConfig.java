@@ -14,6 +14,11 @@ public class RabbitConfig {
     }
 
     @Bean
+    public Queue driverSearchQueue(){
+        return new Queue("driver-search-queue", true);
+    }
+
+    @Bean
     public Jackson2JsonMessageConverter messageConverter() {
         return new Jackson2JsonMessageConverter();
     }

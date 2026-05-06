@@ -3,6 +3,8 @@ package com.sibsutisgo.service;
 import com.sibsutisgo.dto.*;
 import com.sibsutisgo.model.*;
 import com.sibsutisgo.repository.*;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -112,5 +114,16 @@ public class UserService {
 
         driver.setStatus(newStatus);
         driverRepository.save(driver);
+    }
+
+    @Transactional
+    public Long getAvailableDriverId() {
+        return driverRepository.findFirstByStatus(true)
+                .map(driver -> {
+                    driver.setStatus(false);
+                    driverRepository.save(driver);
+                    return driver.getId();
+                })
+                .orElse(null);
     }
 }

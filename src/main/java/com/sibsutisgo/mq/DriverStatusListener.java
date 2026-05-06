@@ -16,9 +16,6 @@ public class DriverStatusListener {
 
     @RabbitListener(queues = "driver-status-queue")
     public void handleDriverStatusUpdate(DriverStatusUpdateEvent event) {
-
-        System.out.println("RabbitMQ: Получено сообщение для водителя ID " + event.driverId());
-
         userService.updateDriverStatus(event.driverId(), event.driverStatus());
     }
 }

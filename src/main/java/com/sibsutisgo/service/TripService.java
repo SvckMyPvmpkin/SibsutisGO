@@ -3,6 +3,8 @@ package com.sibsutisgo.service;
 
 import com.sibsutisgo.dto.TripCreateRequest;
 import com.sibsutisgo.dto.TripResponse;
+import com.sibsutisgo.dto.messaging.DriverSearchRequest;
+import com.sibsutisgo.dto.messaging.DriverSearchResponse;
 import com.sibsutisgo.dto.messaging.DriverStatusUpdateEvent;
 import com.sibsutisgo.model.Trips;
 import com.sibsutisgo.model.TripsStatus;
@@ -39,7 +41,18 @@ public class TripService {
 
         trip.setStatus(TripsStatus.REQUESTED);
 
-        trip.setDriverId(101L);
+        DriverSearchRequest searchRequest = new DriverSearchRequest(true);
+
+        DriverSearchResponse response = (DriverSearchResponse) rabbitTemplate.convertSendAndReceive(
+                "driver-search-queue",
+                searchRequest
+        );
+
+        if (response != null && response.driverId() != null) {
+            trip.setDriverId(response.driverId());
+        } else {
+            throw new RuntimeException("No free drivers");
+        }
 
         Trips saved = tripRepository.save(trip);
         return mapToResponse(saved);
