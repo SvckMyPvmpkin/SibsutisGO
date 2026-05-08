@@ -19,6 +19,11 @@ public class RabbitConfig {
     }
 
     @Bean
+    public Queue passengerVerifyQueue(){
+        return new Queue("passenger-verify-queue", true);
+    }
+
+    @Bean
     public Jackson2JsonMessageConverter messageConverter() {
         return new Jackson2JsonMessageConverter();
     }

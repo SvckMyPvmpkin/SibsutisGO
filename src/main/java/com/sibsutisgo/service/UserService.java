@@ -104,6 +104,10 @@ public class UserService {
         return passengerRepository.findById(id).orElseThrow();
     }
 
+    public boolean isPassengerExist(Long id){
+        return passengerRepository.existsById(id);
+    }
+
     public Drivers getDriver(Long id) {
         return driverRepository.findById(id).orElseThrow();
     }
