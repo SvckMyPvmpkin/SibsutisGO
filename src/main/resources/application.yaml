@@ -39,6 +39,10 @@ spring:
 #  level:
 #    org.hibernate.orm.jdbc.bind: trace
 
+ors:
+  api-key: "eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6IjcyMjhiNzViZTU1NDRhMWRiNDJiMjczZTlhZTBlZmY0IiwiaCI6Im11cm11cjY0In0="
+  base-url: "https://api.openrouteservice.org"
+
 application:
   security:
     jwt:
