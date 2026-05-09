@@ -3,7 +3,6 @@ package com.sibsutisgo.service;
 import com.sibsutisgo.dto.*;
 import com.sibsutisgo.model.*;
 import com.sibsutisgo.repository.*;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -71,6 +70,7 @@ public class UserService {
         driver.setLicenseNumber(dto.licenseNumber());
         driver.setStatus(true);
         driver.setRating(0);
+        driver.setRatingCount(0);
         driver.setCreatedAt(LocalDateTime.now());
 
         Drivers saved = driverRepository.save(driver);
@@ -82,6 +82,7 @@ public class UserService {
                 saved.getPhone(),
                 saved.getLicenseNumber(),
                 saved.getRating(),
+                saved.getRatingCount(),
                 saved.isStatus(),
                 saved.getCreatedAt()
         );
@@ -98,6 +99,7 @@ public class UserService {
                 driver.getPhone(),
                 driver.getLicenseNumber(),
                 driver.getRating(),
+                driver.getRatingCount(),
                 driver.isStatus(),
                 driver.getCreatedAt()
         );
@@ -132,5 +134,27 @@ public class UserService {
                     return driver.getId();
                 })
                 .orElse(null);
+    }
+
+    public void updateRating(Long driverId, Integer newGrade) {
+        Drivers driver = driverRepository.findById(driverId)
+                .orElseThrow(() -> new RuntimeException("Driver not found"));
+
+        double currentRating = (driver.getRating() != null) ? driver.getRating().doubleValue() : 0.0;
+        int count = (driver.getRatingCount() != null) ? driver.getRatingCount() : 0;
+
+        if (count == 0) {
+            driver.setRating((double) newGrade);
+            driver.setRatingCount(1);
+        } else {
+            double updatedRating = ((currentRating * count) + newGrade) / (count + 1);
+
+            updatedRating = Math.round(updatedRating * 100.0) / 100.0;
+
+            driver.setRating(updatedRating);
+            driver.setRatingCount(count + 1);
+        }
+
+        driverRepository.save(driver);
     }
 }

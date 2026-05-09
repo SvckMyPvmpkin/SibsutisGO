@@ -1,8 +1,10 @@
 package com.sibsutisgo.service;
 
 import com.sibsutisgo.dto.ReviewResponse;
+import com.sibsutisgo.dto.messaging.ReviewDriverRatingEvent;
 import com.sibsutisgo.model.Review;
 import com.sibsutisgo.repository.ReviewRepository;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -10,9 +12,11 @@ import java.util.Optional;
 @Service
 public class ReviewService {
     private final ReviewRepository reviewRepository;
+    private final RabbitTemplate rabbitTemplate;
 
-    public ReviewService(ReviewRepository reviewRepository){
+    public ReviewService(ReviewRepository reviewRepository, RabbitTemplate rabbitTemplate){
         this.reviewRepository = reviewRepository;
+        this.rabbitTemplate = rabbitTemplate;
     }
 
     public ReviewResponse createReview(Long tripId, Long driverId, Long passengerId, Integer rating, String description){
@@ -25,6 +29,18 @@ public class ReviewService {
         savedReview.setDescription(description);
 
         Review responseReview = reviewRepository.save(savedReview);
+
+        ReviewDriverRatingEvent reviewDriverRatingEvent = new ReviewDriverRatingEvent(
+                responseReview.getTripId(),
+                responseReview.getDriverId(),
+                responseReview.getPassengerId(),
+                responseReview.getRating(),
+                responseReview.getDescription(),
+                responseReview.getCreatedAt()
+        );
+
+        rabbitTemplate.convertAndSend("review-driver-rating-queue", reviewDriverRatingEvent);
+
         return mapToResponse(responseReview);
     }
 

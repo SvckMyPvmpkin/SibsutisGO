@@ -32,7 +32,10 @@ public class Drivers {
     private boolean status;
 
     @Column(name = "rating", nullable = false)
-    private Integer rating;
+    private double rating;
+
+    @Column(name = "rating_count", nullable = false)
+    private Integer ratingCount;
 
     @CreationTimestamp
     @Column(name = "createdAt", nullable = false,  updatable = false)
@@ -81,12 +84,20 @@ public class Drivers {
         this.status = status;
     }
 
-    public Integer getRating() {
+    public double getRating() {
         return rating;
     }
 
     public void setRating(Integer rating) {
         this.rating = rating;
+    }
+
+    public Integer getRatingCount() {
+        return ratingCount;
+    }
+
+    public void setRatingCount(Integer ratingCount) {
+        this.ratingCount = ratingCount;
     }
 
     public LocalDateTime getCreatedAt() {
