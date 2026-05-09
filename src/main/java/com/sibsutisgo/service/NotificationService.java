@@ -1,17 +1,44 @@
 package com.sibsutisgo.service;
 
+import com.sibsutisgo.dto.NotificationRequest;
+import com.sibsutisgo.dto.NotificationResponse;
 import com.sibsutisgo.model.NotificationStatus;
 import com.sibsutisgo.model.NotificationTasks;
 import com.sibsutisgo.repository.NotificationRepository;
-import com.sibsutisgo.repository.TripRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Service;
 
+import java.util.List;
+
+@Service
 public class NotificationService {
     private final NotificationRepository notificationRepository;
 
     public NotificationService(NotificationRepository notificationRepository) {
         this.notificationRepository = notificationRepository;
+    }
+
+    public void createNotification(NotificationRequest request) {
+        NotificationTasks task = new NotificationTasks();
+        task.setTripId(request.tripId());
+        task.setRecipientId(request.recipientId());
+        task.setRecipientType(request.recipientType());
+        task.setMessage(request.message());
+        task.setStatus(NotificationStatus.PENDING);
+        task.setAttempts(0);
+
+        notificationRepository.save(task);
+    }
+
+    public List<NotificationResponse> getNotificationsByTripId(Long tripId) {
+        return notificationRepository.findByTripId(tripId).stream()
+                .map(task -> new NotificationResponse(
+                        task.getId(), task.getTripId(), task.getRecipientType(),
+                        task.getRecipientId(), task.getMessage(), task.getStatus(),
+                        task.getAttempts(), task.getCreatedAt()
+                ))
+                .toList();
     }
 
     @Async("notification_tasks")

@@ -1,10 +1,12 @@
 package com.sibsutisgo.repository;
 
 import com.sibsutisgo.model.NotificationTasks;
+import com.sibsutisgo.model.Trips;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -22,4 +24,6 @@ public interface NotificationRepository extends JpaRepository<NotificationTasks,
         RETURNING *
         """, nativeQuery = true)
     Optional<NotificationTasks> findAndLockNextTask();
+
+    List<NotificationTasks> findByTripId(Long tripId);
 }
