@@ -8,7 +8,6 @@ import com.sibsutisgo.model.Trips;
 import com.sibsutisgo.model.TripsStatus;
 import com.sibsutisgo.repository.TripRepository;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.TransactionRolledbackException;
 import jakarta.transaction.Transactional;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
@@ -62,9 +61,18 @@ public class TripService {
 
         trip.setStatus(TripsStatus.REQUESTED);
 
-
-
         Trips saved = tripRepository.save(trip);
+
+        TripNotificationEvent notificationEvent = new TripNotificationEvent(
+                saved.getId(),
+                saved.getPassengerId(),
+                saved.getDriverId(),
+                saved.getStatus(),
+                LocalDateTime.now()
+        );
+
+        rabbitTemplate.convertAndSend("notifications-queue", notificationEvent);
+
         return mapToResponse(saved);
     }
 
@@ -101,6 +109,16 @@ public class TripService {
             DriverStatusUpdateEvent event = new DriverStatusUpdateEvent(trip.getDriverId(), true);
             rabbitTemplate.convertAndSend("driver-status-queue", event);
         }
+
+        TripNotificationEvent notificationEvent = new TripNotificationEvent(
+                savedTrip.getId(),
+                savedTrip.getPassengerId(),
+                savedTrip.getDriverId(),
+                savedTrip.getStatus(),
+                LocalDateTime.now()
+        );
+
+        rabbitTemplate.convertAndSend("notifications-queue", notificationEvent);
 
         return new TripResponse(savedTrip.getId(),
                 savedTrip.getPassengerId(), savedTrip.getDriverId(),

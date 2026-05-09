@@ -19,8 +19,13 @@ public class RabbitConfig {
     }
 
     @Bean
-    public Queue passengerVerifyQueue(){
+    public Queue passengerVerifyQueue() {
         return new Queue("passenger-verify-queue", true);
+    }
+
+    @Bean
+    public Queue notificationsQueue() {
+        return new Queue("notifications-queue", true);
     }
 
     @Bean

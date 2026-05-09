@@ -19,6 +19,7 @@ public class NotificationService {
         this.notificationRepository = notificationRepository;
     }
 
+    @Transactional
     public void createNotification(NotificationRequest request) {
         NotificationTasks task = new NotificationTasks();
         task.setTripId(request.tripId());
