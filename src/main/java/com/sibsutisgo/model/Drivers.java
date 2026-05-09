@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Entity
 @Table(name="drivers")
@@ -31,6 +30,9 @@ public class Drivers {
     // 1 - доступен
     @Column(name = "status", nullable = false)
     private boolean status;
+
+    @Column(name = "rating", nullable = false)
+    private Integer rating;
 
     @CreationTimestamp
     @Column(name = "createdAt", nullable = false,  updatable = false)
@@ -77,6 +79,14 @@ public class Drivers {
 
     public void setStatus(boolean status) {
         this.status = status;
+    }
+
+    public Integer getRating() {
+        return rating;
+    }
+
+    public void setRating(Integer rating) {
+        this.rating = rating;
     }
 
     public LocalDateTime getCreatedAt() {

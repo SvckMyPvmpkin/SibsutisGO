@@ -12,9 +12,14 @@ public class Review {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-//    @OneToOne(fetch = FetchType.LAZY)
     @Column(name = "trip_id", nullable = false)
     private Long tripId;
+
+    @Column(name = "passenger_id", nullable = false)
+    private Long passengerId;
+
+    @Column(name = "driver_id", nullable = false)
+    private Long driverId;
 
     @Column(nullable = false)
     private Integer rating;
@@ -38,6 +43,22 @@ public class Review {
 
     public void setTripId(Long tripId) {
         this.tripId = tripId;
+    }
+
+    public Long getPassengerId() {
+        return passengerId;
+    }
+
+    public void setPassengerId(Long passengerId) {
+        this.passengerId = passengerId;
+    }
+
+    public Long getDriverId() {
+        return driverId;
+    }
+
+    public void setDriverId(Long driverId) {
+        this.driverId = driverId;
     }
 
     public Integer getRating() {

@@ -2,9 +2,7 @@ package com.sibsutisgo.service;
 
 import com.sibsutisgo.dto.ReviewResponse;
 import com.sibsutisgo.model.Review;
-import com.sibsutisgo.model.Trips;
 import com.sibsutisgo.repository.ReviewRepository;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -17,10 +15,12 @@ public class ReviewService {
         this.reviewRepository = reviewRepository;
     }
 
-    public ReviewResponse createReview(Long tripId, Integer rating, String description){
+    public ReviewResponse createReview(Long tripId, Long driverId, Long passengerId, Integer rating, String description){
         if (rating > 5 || rating < 1) throw new IllegalArgumentException("Неверная оценка");
         Review savedReview = new Review();
         savedReview.setTripId(tripId);
+        savedReview.setDriverId(driverId);
+        savedReview.setPassengerId(passengerId);
         savedReview.setRating(rating);
         savedReview.setDescription(description);
 
@@ -41,8 +41,16 @@ public class ReviewService {
         return reviewRepository.findById(id).map(this::mapToResponse);
     }
 
+    public Optional<ReviewResponse> getReviewByDriverId(Long driverId){
+        return reviewRepository.findByDriverId(driverId).map(this::mapToResponse);
+    }
+
+    public Optional<ReviewResponse> getReviewByPassengerId(Long passengerId){
+        return reviewRepository.findByPassengerId(passengerId).map(this::mapToResponse);
+    }
+
     public ReviewResponse mapToResponse(Review review){
-        return new ReviewResponse(review.getId(), review.getTripId(),
+        return new ReviewResponse(review.getId(), review.getTripId(), review.getDriverId(), review.getPassengerId(),
                 review.getRating(), review.getDescription(), review.getCreatedAt());
     }
 }

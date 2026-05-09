@@ -8,6 +8,7 @@ public record DriverResponse(
         String email,
         String phone,
         String licenseNumber,
+        Integer rating,
         boolean status,
         LocalDateTime createdAt
 ) {}

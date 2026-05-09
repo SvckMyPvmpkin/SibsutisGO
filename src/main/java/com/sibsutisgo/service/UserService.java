@@ -70,6 +70,7 @@ public class UserService {
         driver.setPhone(dto.phone());
         driver.setLicenseNumber(dto.licenseNumber());
         driver.setStatus(true);
+        driver.setRating(0);
         driver.setCreatedAt(LocalDateTime.now());
 
         Drivers saved = driverRepository.save(driver);
@@ -80,6 +81,7 @@ public class UserService {
                 saved.getEmail(),
                 saved.getPhone(),
                 saved.getLicenseNumber(),
+                saved.getRating(),
                 saved.isStatus(),
                 saved.getCreatedAt()
         );
@@ -95,6 +97,7 @@ public class UserService {
                 driver.getEmail(),
                 driver.getPhone(),
                 driver.getLicenseNumber(),
+                driver.getRating(),
                 driver.isStatus(),
                 driver.getCreatedAt()
         );

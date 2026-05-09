@@ -29,6 +29,11 @@ public class RabbitConfig {
     }
 
     @Bean
+    public Queue reviewDriverRatingQueue() {
+        return new Queue("review-driver-rating-queue", true);
+    }
+
+    @Bean
     public Jackson2JsonMessageConverter messageConverter() {
         return new Jackson2JsonMessageConverter();
     }
