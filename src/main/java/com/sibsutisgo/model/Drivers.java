@@ -25,6 +25,10 @@ public class Drivers {
     @Column(name = "license_number", nullable = false, length = 16)
     private String license_number;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "car_type", nullable = false)
+    private CarType carType;
+
     // Статус доступности водителя для выдачи заказа
     // 0 - недоступен
     // 1 - доступен
@@ -114,5 +118,13 @@ public class Drivers {
 
     public void setLicenseNumber(String s) {
         this.license_number = s;
+    }
+
+    public CarType getCarType() {
+        return carType;
+    }
+
+    public void setCarType(CarType carType) {
+        this.carType = carType;
     }
 }

@@ -13,6 +13,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -28,7 +29,27 @@ public class TripService {
     }
 
     public TripResponse createTrip(TripCreateRequest request) {
-        BigDecimal price = calculatePrice(request.origin(), request.destination());
+        RouteRequest routeRequest = new RouteRequest(request.origin(), request.destination());
+        RouteResponse routeResponse = (RouteResponse) rabbitTemplate.convertSendAndReceive(
+                "route-request-queue",
+                routeRequest
+        );
+
+        if (routeResponse == null) {
+            throw new RuntimeException("Routing service is unavailable");
+        }
+
+        double km = routeResponse.distanceKm();
+        double carMultiplier = request.carType().getCoefficient();
+        double trafficMultiplier = getTrafficCongestion();
+
+        BigDecimal price = BigDecimal.valueOf(km)
+                .multiply(BigDecimal.valueOf(40.0))         // расстояние * 40
+                .multiply(BigDecimal.valueOf(carMultiplier)) // * коэффициент машины
+                .multiply(BigDecimal.valueOf(trafficMultiplier)) // * пробки
+                .setScale(2, RoundingMode.HALF_UP);         // округление до копеек
+
+
 
         PassengerVerifyRequest verifyRequest = new PassengerVerifyRequest(request.passengerId());
 
@@ -41,14 +62,14 @@ public class TripService {
             throw new RuntimeException("Passenger doesn't exist");
         }
 
-        DriverSearchRequest searchRequest = new DriverSearchRequest(true);
+        DriverSearchRequest searchRequest = new DriverSearchRequest(true, request.carType());
 
         DriverSearchResponse searchResponse = (DriverSearchResponse) rabbitTemplate.convertSendAndReceive(
                 "driver-search-queue",
                 searchRequest
         );
 
-        if (searchResponse == null || searchResponse.driverId() == null) {
+        if (searchResponse == null || searchResponse.driverId() == null || searchResponse.carType() != searchRequest.carType()) {
             throw new RuntimeException("No free drivers");
         }
 
@@ -91,12 +112,12 @@ public class TripService {
     @Transactional
     public TripResponse updateTripStatus(Long id, TripsStatus newStatus) {
         Trips trip = tripRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Поездка с ID " + id + " не найдена"));
+                .orElseThrow(() -> new EntityNotFoundException("Trip with ID " + id + " doesn't found"));
 
         TripsStatus oldStatus = trip.getStatus();
 
         if (oldStatus == TripsStatus.CANCELLED || oldStatus == TripsStatus.COMPLETED) {
-            throw new IllegalStateException("Нельзя изменять статус завершенной или отмененной поездки");
+            throw new IllegalStateException("You can't change CANCELLED or COMPLETED trip status");
         }
 
         validateStatusTransition(oldStatus, newStatus);
@@ -134,7 +155,7 @@ public class TripService {
         };
 
         if (!isValid) {
-            throw new IllegalArgumentException("Некорректный переход из статуса " + current + " в " + next);
+            throw new IllegalArgumentException("Incorrect transition from status " + current + " to " + next);
         }
     }
 
@@ -146,7 +167,19 @@ public class TripService {
         );
     }
 
-    private BigDecimal calculatePrice(String origin, String destination) {
-        return new BigDecimal("500.00");
+    private double getTrafficCongestion() {
+        int hour = java.time.LocalTime.now().getHour();
+
+        if (hour >= 17 && hour < 19) return 1.9;
+
+        if (hour >= 8 && hour < 11) return 1.7;
+
+        if (hour >= 11 && hour < 16) return 1.45;
+
+        if (hour == 7 || hour == 16 || (hour >= 19 && hour < 21)) return 1.3;
+
+        if (hour >= 21 && hour < 23) return 1.15;
+
+        return 1.0;
     }
 }

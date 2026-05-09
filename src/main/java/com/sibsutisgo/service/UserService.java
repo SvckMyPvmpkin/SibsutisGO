@@ -68,6 +68,7 @@ public class UserService {
         driver.setEmail(dto.email());
         driver.setPhone(dto.phone());
         driver.setLicenseNumber(dto.licenseNumber());
+        driver.setCarType(dto.carType());
         driver.setStatus(true);
         driver.setRating(0.0);
         driver.setRatingCount(0);
@@ -81,6 +82,7 @@ public class UserService {
                 saved.getEmail(),
                 saved.getPhone(),
                 saved.getLicenseNumber(),
+                saved.getCarType(),
                 saved.getRating(),
                 saved.getRatingCount(),
                 saved.isStatus(),
@@ -98,6 +100,7 @@ public class UserService {
                 driver.getEmail(),
                 driver.getPhone(),
                 driver.getLicenseNumber(),
+                driver.getCarType(),
                 driver.getRating(),
                 driver.getRatingCount(),
                 driver.isStatus(),
@@ -126,8 +129,8 @@ public class UserService {
     }
 
     @Transactional
-    public Long getAvailableDriverId() {
-        return driverRepository.findFirstByStatus(true)
+    public Long getAvailableDriverId(CarType carType) {
+        return driverRepository.findFirstByStatusAndCarType(true, carType)
                 .map(driver -> {
                     driver.setStatus(false);
                     driverRepository.save(driver);
@@ -141,7 +144,7 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("Driver not found"));
 
         if (newGrade == null) {
-            throw new IllegalArgumentException("Оценка не может быть null");
+            throw new IllegalArgumentException("Grade can't be null");
         }
 
         double currentRating = (driver.getRating() != null) ? driver.getRating().doubleValue() : 0.0;

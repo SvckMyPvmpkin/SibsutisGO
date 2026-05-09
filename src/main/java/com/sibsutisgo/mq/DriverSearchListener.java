@@ -15,13 +15,13 @@ public class DriverSearchListener {
     }
 
     @RabbitListener(queues = "driver-search-queue")
-    public DriverSearchResponse handleSearchRequest(DriverSearchRequest request){
-        Long foundDriverId = userService.getAvailableDriverId();
+    public DriverSearchResponse handleSearchRequest(DriverSearchRequest request) {
+        Long foundDriverId = userService.getAvailableDriverId(request.carType());
 
-        if(foundDriverId != null) {
-            return new DriverSearchResponse(foundDriverId);
+        if (foundDriverId != null) {
+            return new DriverSearchResponse(foundDriverId, request.carType());
         } else {
-            return new DriverSearchResponse(null);
+            return new DriverSearchResponse(null, null);
         }
     }
 }

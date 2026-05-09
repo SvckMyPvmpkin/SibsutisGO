@@ -39,6 +39,11 @@ public class RabbitConfig {
     }
 
     @Bean
+    public Queue routeRequestQueue() {
+        return new Queue("route-request-queue", true);
+    }
+
+    @Bean
     public Jackson2JsonMessageConverter messageConverter() {
         return new Jackson2JsonMessageConverter();
     }
