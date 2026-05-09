@@ -87,4 +87,8 @@ public class NotificationTasks {
         public void setAttempts(Integer attempts) {
             this.attempts = attempts;
         }
+
+        public LocalDateTime getCreatedAt() {
+            return createdAt;
+        }
 }
