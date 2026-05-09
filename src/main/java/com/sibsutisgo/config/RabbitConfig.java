@@ -34,6 +34,11 @@ public class RabbitConfig {
     }
 
     @Bean
+    public Queue tripVerifyQueue() {
+        return new Queue("trip-verify-queue", true);
+    }
+
+    @Bean
     public Jackson2JsonMessageConverter messageConverter() {
         return new Jackson2JsonMessageConverter();
     }

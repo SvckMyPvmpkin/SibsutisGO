@@ -2,10 +2,13 @@ package com.sibsutisgo.service;
 
 import com.sibsutisgo.dto.ReviewResponse;
 import com.sibsutisgo.dto.messaging.ReviewDriverRatingEvent;
+import com.sibsutisgo.dto.messaging.TripVerifyRequest;
+import com.sibsutisgo.dto.messaging.TripVerifyResponse;
 import com.sibsutisgo.model.Review;
 import com.sibsutisgo.repository.ReviewRepository;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -19,29 +22,44 @@ public class ReviewService {
         this.rabbitTemplate = rabbitTemplate;
     }
 
-    public ReviewResponse createReview(Long tripId, Long driverId, Long passengerId, Integer rating, String description){
-        if (rating > 5 || rating < 1) throw new IllegalArgumentException("Неверная оценка");
-        Review savedReview = new Review();
-        savedReview.setTripId(tripId);
-        savedReview.setDriverId(driverId);
-        savedReview.setPassengerId(passengerId);
-        savedReview.setRating(rating);
-        savedReview.setDescription(description);
+    @Transactional
+    public ReviewResponse createReview(Long tripId, Long driverId, Long passengerId, Integer rating, String description) {
+        if (rating > 5 || rating < 1) {
+            throw new IllegalArgumentException("Wrong grade: this must be from 1 to 5");
+        }
 
-        Review responseReview = reviewRepository.save(savedReview);
-
-        ReviewDriverRatingEvent reviewDriverRatingEvent = new ReviewDriverRatingEvent(
-                responseReview.getTripId(),
-                responseReview.getDriverId(),
-                responseReview.getPassengerId(),
-                responseReview.getRating().doubleValue(),
-                responseReview.getDescription(),
-                responseReview.getCreatedAt()
+        TripVerifyRequest verifyRequest = new TripVerifyRequest(tripId, passengerId);
+        TripVerifyResponse verifyResponse = (TripVerifyResponse) rabbitTemplate.convertSendAndReceive(
+                "trip-verify-queue",
+                verifyRequest
         );
 
-        rabbitTemplate.convertAndSend("review-driver-rating-queue", reviewDriverRatingEvent);
+        if (verifyResponse == null || !verifyResponse.isValid()) {
+            String errorMsg = (verifyResponse != null) ? verifyResponse.errorMessage() : "Trip Service timeout";
+            throw new IllegalStateException("Validation failed: " + errorMsg);
+        }
 
-        return mapToResponse(responseReview);
+        Review review = new Review();
+        review.setTripId(tripId);
+        review.setDriverId(driverId);
+        review.setPassengerId(passengerId);
+        review.setRating(rating);
+        review.setDescription(description);
+
+        Review savedReview = reviewRepository.save(review);
+
+        ReviewDriverRatingEvent event = new ReviewDriverRatingEvent(
+                savedReview.getTripId(),
+                savedReview.getDriverId(),
+                savedReview.getPassengerId(),
+                savedReview.getRating().doubleValue(),
+                savedReview.getDescription(),
+                savedReview.getCreatedAt()
+        );
+
+        rabbitTemplate.convertAndSend("review-driver-rating-queue", event);
+
+        return mapToResponse(savedReview);
     }
 
     public void deleteReview(Long id){
