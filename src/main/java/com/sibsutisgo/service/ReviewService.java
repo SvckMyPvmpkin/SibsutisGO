@@ -34,7 +34,7 @@ public class ReviewService {
                 responseReview.getTripId(),
                 responseReview.getDriverId(),
                 responseReview.getPassengerId(),
-                responseReview.getRating(),
+                responseReview.getRating().doubleValue(),
                 responseReview.getDescription(),
                 responseReview.getCreatedAt()
         );

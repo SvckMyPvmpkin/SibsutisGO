@@ -69,7 +69,7 @@ public class UserService {
         driver.setPhone(dto.phone());
         driver.setLicenseNumber(dto.licenseNumber());
         driver.setStatus(true);
-        driver.setRating(0);
+        driver.setRating(0.0);
         driver.setRatingCount(0);
         driver.setCreatedAt(LocalDateTime.now());
 
@@ -136,15 +136,19 @@ public class UserService {
                 .orElse(null);
     }
 
-    public void updateRating(Long driverId, Integer newGrade) {
+    public void updateRating(Long driverId, Double newGrade) {
         Drivers driver = driverRepository.findById(driverId)
                 .orElseThrow(() -> new RuntimeException("Driver not found"));
+
+        if (newGrade == null) {
+            throw new IllegalArgumentException("Оценка не может быть null");
+        }
 
         double currentRating = (driver.getRating() != null) ? driver.getRating().doubleValue() : 0.0;
         int count = (driver.getRatingCount() != null) ? driver.getRatingCount() : 0;
 
         if (count == 0) {
-            driver.setRating((double) newGrade);
+            driver.setRating(newGrade);
             driver.setRatingCount(1);
         } else {
             double updatedRating = ((currentRating * count) + newGrade) / (count + 1);

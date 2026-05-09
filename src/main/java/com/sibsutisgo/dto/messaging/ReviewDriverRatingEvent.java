@@ -6,7 +6,7 @@ public record ReviewDriverRatingEvent(
         Long tripId,
         Long driverId,
         Long passengerId,
-        Integer rating,
+        Double rating,
         String description,
         LocalDateTime createdAt
 ) {}

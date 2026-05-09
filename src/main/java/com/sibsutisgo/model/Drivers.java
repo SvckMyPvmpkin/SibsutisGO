@@ -32,7 +32,7 @@ public class Drivers {
     private boolean status;
 
     @Column(name = "rating", nullable = false)
-    private double rating;
+    private Double rating;
 
     @Column(name = "rating_count", nullable = false)
     private Integer ratingCount;
@@ -84,11 +84,11 @@ public class Drivers {
         this.status = status;
     }
 
-    public double getRating() {
+    public Double getRating() {
         return rating;
     }
 
-    public void setRating(Integer rating) {
+    public void setRating(Double rating) {
         this.rating = rating;
     }
 
