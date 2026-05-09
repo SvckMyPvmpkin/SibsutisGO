@@ -1,9 +1,11 @@
 package com.sibsutisgo.service;
 
+import com.sibsutisgo.dto.NotificationRequest;
 import com.sibsutisgo.dto.ReviewResponse;
 import com.sibsutisgo.dto.messaging.ReviewDriverRatingEvent;
 import com.sibsutisgo.dto.messaging.TripVerifyRequest;
 import com.sibsutisgo.dto.messaging.TripVerifyResponse;
+import com.sibsutisgo.model.RecipientType;
 import com.sibsutisgo.model.Review;
 import com.sibsutisgo.repository.ReviewRepository;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -58,6 +60,25 @@ public class ReviewService {
         );
 
         rabbitTemplate.convertAndSend("review-driver-rating-queue", event);
+
+        NotificationRequest passengerNotify = new NotificationRequest(
+                tripId,
+                passengerId,
+                RecipientType.PASSENGER,
+                "Спасибо за вашу оценку (" + rating + " зв.)! Нам важно ваше мнение."
+        );
+
+        rabbitTemplate.convertAndSend("notifications-queue", passengerNotify);
+
+        if (rating == 5) {
+            NotificationRequest driverNotify = new NotificationRequest(
+                    tripId,
+                    driverId,
+                    RecipientType.DRIVER,
+                    "Пассажир оценил вашу работу на 5 звезд! Так держать!"
+            );
+            rabbitTemplate.convertAndSend("notifications-queue", driverNotify);
+        }
 
         return mapToResponse(savedReview);
     }

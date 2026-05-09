@@ -42,7 +42,7 @@ public class NotificationService {
                 .toList();
     }
 
-    @Async("notification_tasks")
+    @Async("notificationExecutor")
     @Transactional
     public void processTasks(NotificationTasks task) {
         try {
