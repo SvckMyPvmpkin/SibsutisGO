@@ -11,6 +11,8 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -97,11 +99,13 @@ public class TripService {
         return mapToResponse(saved);
     }
 
+    @Cacheable(value = "trips", key = "#id")
     public Optional<TripResponse> getTripById(Long id) {
         return tripRepository.findById(id)
                 .map(this::mapToResponse);
     }
 
+    @Cacheable(value = "passenger_trips", key = "#passengerId")
     public List<TripResponse> getTripsByPassengerId(Long passengerId) {
         return tripRepository.findByPassengerId(passengerId)
                 .stream()
@@ -110,6 +114,7 @@ public class TripService {
     }
 
     @Transactional
+    @CacheEvict(value = "trips", key = "#id")
     public TripResponse updateTripStatus(Long id, TripsStatus newStatus) {
         Trips trip = tripRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Trip with ID " + id + " doesn't found"));
