@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Entity
 @Table(name="drivers")
@@ -26,11 +25,21 @@ public class Drivers {
     @Column(name = "license_number", nullable = false, length = 16)
     private String license_number;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "car_type", nullable = false)
+    private CarType carType;
+
     // Статус доступности водителя для выдачи заказа
     // 0 - недоступен
     // 1 - доступен
     @Column(name = "status", nullable = false)
     private boolean status;
+
+    @Column(name = "rating", nullable = false)
+    private Double rating;
+
+    @Column(name = "rating_count", nullable = false)
+    private Integer ratingCount;
 
     @CreationTimestamp
     @Column(name = "createdAt", nullable = false,  updatable = false)
@@ -79,6 +88,22 @@ public class Drivers {
         this.status = status;
     }
 
+    public Double getRating() {
+        return rating;
+    }
+
+    public void setRating(Double rating) {
+        this.rating = rating;
+    }
+
+    public Integer getRatingCount() {
+        return ratingCount;
+    }
+
+    public void setRatingCount(Integer ratingCount) {
+        this.ratingCount = ratingCount;
+    }
+
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
@@ -93,5 +118,13 @@ public class Drivers {
 
     public void setLicenseNumber(String s) {
         this.license_number = s;
+    }
+
+    public CarType getCarType() {
+        return carType;
+    }
+
+    public void setCarType(CarType carType) {
+        this.carType = carType;
     }
 }

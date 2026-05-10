@@ -1,13 +1,12 @@
 package com.sibsutisgo.dto.messaging;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-public record TripCreatedEvent(
+public record ReviewDriverRatingEvent(
         Long tripId,
+        Long driverId,
         Long passengerId,
-        String origin,
-        String destination,
-        BigDecimal price,
+        Double rating,
+        String description,
         LocalDateTime createdAt
 ) {}

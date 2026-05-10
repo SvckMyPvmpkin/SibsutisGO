@@ -1,5 +1,6 @@
 package com.sibsutisgo.dto;
 
+import com.sibsutisgo.model.CarType;
 import java.time.LocalDateTime;
 
 public record DriverResponse(
@@ -8,6 +9,9 @@ public record DriverResponse(
         String email,
         String phone,
         String licenseNumber,
+        CarType carType,
+        Double rating,
+        Integer ratingCount,
         boolean status,
         LocalDateTime createdAt
 ) {}

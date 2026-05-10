@@ -8,16 +8,40 @@ spring:
     password: admin
 
   jpa:
-    show-sql: true
-    hibernate:
-      ddl-auto: update
+    show-sql: false
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        highlight_sql: true
+    hibernate:
+      ddl-auto: update
 
-  docker:
+    docker:
     compose:
       enabled: false
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+    listener:
+      simple:
+        retry:
+          enabled: true
+          initial-interval: 3s
+          max-attempts: 3
+        concurrency: 1
+        max-concurrency: 5
+
+#logging:
+#  level:
+#    org.hibernate.orm.jdbc.bind: trace
+
+ors:
+  api-key: "eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6IjcyMjhiNzViZTU1NDRhMWRiNDJiMjczZTlhZTBlZmY0IiwiaCI6Im11cm11cjY0In0="
+  base-url: "https://api.openrouteservice.org"
 
 application:
   security:

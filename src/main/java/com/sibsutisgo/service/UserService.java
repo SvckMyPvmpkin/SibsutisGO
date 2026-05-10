@@ -3,6 +3,7 @@ package com.sibsutisgo.service;
 import com.sibsutisgo.dto.*;
 import com.sibsutisgo.model.*;
 import com.sibsutisgo.repository.*;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -67,7 +68,10 @@ public class UserService {
         driver.setEmail(dto.email());
         driver.setPhone(dto.phone());
         driver.setLicenseNumber(dto.licenseNumber());
+        driver.setCarType(dto.carType());
         driver.setStatus(true);
+        driver.setRating(0.0);
+        driver.setRatingCount(0);
         driver.setCreatedAt(LocalDateTime.now());
 
         Drivers saved = driverRepository.save(driver);
@@ -78,6 +82,9 @@ public class UserService {
                 saved.getEmail(),
                 saved.getPhone(),
                 saved.getLicenseNumber(),
+                saved.getCarType(),
+                saved.getRating(),
+                saved.getRatingCount(),
                 saved.isStatus(),
                 saved.getCreatedAt()
         );
@@ -93,6 +100,9 @@ public class UserService {
                 driver.getEmail(),
                 driver.getPhone(),
                 driver.getLicenseNumber(),
+                driver.getCarType(),
+                driver.getRating(),
+                driver.getRatingCount(),
                 driver.isStatus(),
                 driver.getCreatedAt()
         );
@@ -100,6 +110,10 @@ public class UserService {
 
     public Passengers getPassenger(Long id) {
         return passengerRepository.findById(id).orElseThrow();
+    }
+
+    public boolean isPassengerExist(Long id){
+        return passengerRepository.existsById(id);
     }
 
     public Drivers getDriver(Long id) {
@@ -111,6 +125,43 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("Driver not found with id: " + id));
 
         driver.setStatus(newStatus);
+        driverRepository.save(driver);
+    }
+
+    @Transactional
+    public Long getAvailableDriverId(CarType carType) {
+        return driverRepository.findFirstByStatusAndCarType(true, carType)
+                .map(driver -> {
+                    driver.setStatus(false);
+                    driverRepository.save(driver);
+                    return driver.getId();
+                })
+                .orElse(null);
+    }
+
+    public void updateRating(Long driverId, Double newGrade) {
+        Drivers driver = driverRepository.findById(driverId)
+                .orElseThrow(() -> new RuntimeException("Driver not found"));
+
+        if (newGrade == null) {
+            throw new IllegalArgumentException("Grade can't be null");
+        }
+
+        double currentRating = (driver.getRating() != null) ? driver.getRating().doubleValue() : 0.0;
+        int count = (driver.getRatingCount() != null) ? driver.getRatingCount() : 0;
+
+        if (count == 0) {
+            driver.setRating(newGrade);
+            driver.setRatingCount(1);
+        } else {
+            double updatedRating = ((currentRating * count) + newGrade) / (count + 1);
+
+            updatedRating = Math.round(updatedRating * 100.0) / 100.0;
+
+            driver.setRating(updatedRating);
+            driver.setRatingCount(count + 1);
+        }
+
         driverRepository.save(driver);
     }
 }
