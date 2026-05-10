@@ -26,7 +26,7 @@ public class NotificationController {
     }
 
     @GetMapping
-    public List<NotificationResponse> getNotificationsByTrip(@RequestParam("trip_id") Long tripId) {
+    public List<NotificationResponse> getNotificationsByTrip(@RequestParam(required = false, value = "trip_id") Long tripId) {
         return notificationService.getNotificationsByTripId(tripId);
     }
 }

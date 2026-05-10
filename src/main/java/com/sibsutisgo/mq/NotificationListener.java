@@ -3,6 +3,7 @@ package com.sibsutisgo.mq;
 
 import com.sibsutisgo.dto.NotificationRequest;
 import com.sibsutisgo.dto.messaging.ReviewDriverRatingEvent;
+import com.sibsutisgo.dto.messaging.SupportNotificationEvent;
 import com.sibsutisgo.dto.messaging.TripNotificationEvent;
 import com.sibsutisgo.model.RecipientType;
 import com.sibsutisgo.service.NotificationService;
@@ -58,5 +59,15 @@ public class NotificationListener {
                     "Excellent work! Passenger gave you 5 stars!"
             ));
         }
+    }
+
+    @RabbitHandler
+    public void handleSupportStatusChangeEvent(SupportNotificationEvent event){
+        notificationService.createNotification(new NotificationRequest(
+                event.tripId(),
+                event.systemId(),
+                RecipientType.SYSTEM,
+                event.message()
+        ));
     }
 }
